@@ -23,8 +23,19 @@ export default (errorClass: any, handler: HandlerFunction): any => {
     return (
         target: any,
         propertyKey: string,
-        descriptor: PropertyDescriptor,
+        descriptor?: PropertyDescriptor,
     ) => {
+        if (descriptor === undefined) {
+            descriptor = Object.getOwnPropertyDescriptor(target, propertyKey);
+        }
+
+        if (descriptor === undefined) {
+            throw Error('Something went wrong.');
+        }
+      
+        if (typeof descriptor!.value !== 'function') {
+            throw Error('Permission decorator can only be used on a method');
+        }
         // save a reference to the original method
         const originalMethod = descriptor.value
 
